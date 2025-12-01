@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Rectangle Area dApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.0/dist/ethers.umd.min.js"></script>
+</head>
+
+<body>
+    <h1>Rectangle Area dApp</h1>
+
+    <button id="connectWallet">Connect Wallet</button>
+    <br><br>
+
+    <label>Width:</label>
+    <input id="widthInput" type="number" min="1">
+    <button id="setWidthButton">Set Width 210504512</button>
+    <br><br>
+
+    <label>Height:</label>
+    <input id="heightInput" type="number" min="1">
+    <button id="setHeightButton">Set Height 210504512</button>
+    <br><br>
+
+    <button id="areaButton">Area 210504512</button>
+
+    <h2 id="result"></h2>
+
+    <script>
+        //-------------------------------
+        // REPLACE WITH YOUR REAL VALUES
+        //-------------------------------
+
+        const CONTRACT_ADDRESS = "0x07BAbbA1c79527DcA6D96ED8458660B139fca25c";
+
+        const ABI = [{
+            "inputs": [{
+                "internalType": "uint256",
+                "name": "h",
+                "type": "uint256"
+            }],
+            "name": "setHeight",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }, {
+            "inputs": [{
+                "internalType": "uint256",
+                "name": "w",
+                "type": "uint256"
+            }],
+            "name": "setWidth",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }, {
+            "inputs": [],
+            "name": "area",
+            "outputs": [{
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }],
+            "stateMutability": "view",
+            "type": "function"
+        }, {
+            "inputs": [],
+            "name": "height",
+            "outputs": [{
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }],
+            "stateMutability": "view",
+            "type": "function"
+        }, {
+            "inputs": [],
+            "name": "width",
+            "outputs": [{
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }],
+            "stateMutability": "view",
+            "type": "function"
+        }];
+        // Example format:
+        // const ABI = [ {name:"setWidth",...}, {name:"setHeight",...}, {name:"area",...} ];
+
+        let provider;
+        let signer;
+        let contract;
+
+        // Connect wallet
+        document.getElementById("connectWallet").onclick = async() => {
+            if (typeof window.ethereum !== "undefined") {
+                await ethereum.request({
+                    method: "eth_requestAccounts"
+                });
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+                alert("Wallet Connected!");
+            } else {
+                alert("Please install MetaMask.");
+            }
+        };
+
+        // Set Width
+        document.getElementById("setWidthButton").onclick = async() => {
+            const w = document.getElementById("widthInput").value;
+            if (w <= 0) return alert("Enter a valid width.");
+
+            try {
+                const tx = await contract.setWidth(w);
+                await tx.wait();
+                alert("Width saved on Sepolia!");
+            } catch (e) {
+                alert("Error: " + e);
+            }
+        };
+
+        // Set Height
+        document.getElementById("setHeightButton").onclick = async() => {
+            const h = document.getElementById("heightInput").value;
+            if (h <= 0) return alert("Enter a valid height.");
+
+            try {
+                const tx = await contract.setHeight(h);
+                await tx.wait();
+                alert("Height saved on Sepolia!");
+            } catch (e) {
+                alert("Error: " + e);
+            }
+        };
+
+        // Compute Area
+        document.getElementById("areaButton").onclick = async() => {
+            try {
+                const a = await contract.area();
+                document.getElementById("result").innerText = "Area = " + a.toString();
+            } catch (e) {
+                alert("Error: " + e);
+            }
+        };
+    </script>
+
+</body>
+
+</html>
